@@ -1,16 +1,22 @@
 DISPLAY_CHOICES = %w(rock paper scissors lizard spock).freeze
-VALID_CHOICES = { "rock" => %w(r rock), "paper" => %w(p paper), "scissors" => %w(s scissors), "lizard" => %w(l lizard), "spock" => %w(s spock) }.freeze
+VALID_CHOICES = {
+  "rock" => %w(r rock),
+  "paper" => %w(p paper),
+  "scissors" => %w(s scissors),
+  "lizard" => %w(l lizard),
+  "spock" => %w(s spock)
+}.freeze
 
-choice_found = []
-computer_score = 0
-human_score = 0
+BEATS = {
+  'rock' => %w(scissors lizard),
+  'paper' => %w(rock spock),
+  'scissors' => %w(paper lizard),
+  'lizard' => %w(paper spock),
+  'spock' => %w(rock scissors)
+}.freeze
 
 def win?(first, second)
-  (first == 'rock' && (second == 'scissors' || second == 'lizard')) ||
-    (first == 'paper' && (second == 'rock' || second == 'spock')) ||
-    (first == 'scissors' && (second == 'paper' || second == 'lizard')) ||
-    (first == 'lizard' && (second == 'paper' || second == 'spock')) ||
-    (first == 'spock' && (second == 'rock' || second == 'scissors'))
+  BEATS[first].include?(second)
 end
 
 def display_results(player, computer)
@@ -35,7 +41,11 @@ def prompt(message)
   puts("=> #{message}")
 end
 
-loop do # play_again?
+computer_score = 0
+human_score = 0
+
+loop do # outer_loop
+  choice_found = []
   choice = ''
   loop do # gather choice, validate it, and provide error msgs for invalid selections
     prompt("Choose one: #{DISPLAY_CHOICES.join(', ')}")
@@ -49,7 +59,8 @@ loop do # play_again?
     # now validate findings
     break if choice_found.length == 1
 
-    puts "Based on your choice: #{choice}, it is unclear which of the following you meant: #{choice_found}.  Please retry and type in the full word of your desired choice." if choice_found.length > 1
+    puts "Based on your choice: #{choice}, it is unclear which of the following you meant: #{choice_found}. " \
+          "Please retry and type in the full word of your desired choice." if choice_found.length > 1
     puts "Your input of #{choice} was invalid.  Please try again!" if choice_found.empty?
   end # loop..do
 
