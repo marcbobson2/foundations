@@ -157,17 +157,17 @@ def calculate_vector_score(vector_contents)
   score
 end
 
+board_array = []
 loop do
   system("clear")
   puts "Welcome to TicTacToe!"
   puts "Please tell us your name:"
   player_name = gets.chomp
 
-  board_array = []
   initialize_board(board_array)
+  display_board(board_array)
 
   loop do
-    display_board(board_array)
     player_move!(board_array, player_name)
     display_board(board_array)
 
