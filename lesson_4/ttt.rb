@@ -46,6 +46,7 @@ end
 
 def display_board(board)
   system("clear")
+  puts "You are #{PLAYER_MARKER} and the computer is #{COMPUTER_MARKER}"
   puts ""
   3.times do |num|
     current_square = (num * 3)
