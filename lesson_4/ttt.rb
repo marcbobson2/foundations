@@ -1,5 +1,5 @@
 require 'pry'
-player_name=""
+player_name = ""
 ROW_SEPARATOR = "-----+-----+-----".freeze
 COL_SEPARATOR = "     |     |     ".freeze
 PLAYER_MARKER = "X".freeze
