@@ -59,8 +59,7 @@ def display_board(board)
 end
 
 def display_dynamic_row(board, current_square)
-  puts "  " + board[current_square] + "  |  " + board[current_square + 1]\
-  + "  |  " + board[current_square + 2]
+  puts "  #{board[current_square]}  |  #{board[current_square + 1]}  |  #{board[current_square + 2]}"
 end
 
 def player_move!(brd, player_name)
@@ -95,11 +94,7 @@ def board_has_empty_spaces?(brd)
 end
 
 def find_open_squares(brd)
-  viable_moves = []
-  brd.each_index do |index|
-    viable_moves << index if brd[index] == EMPTY_MARKER
-  end
-  viable_moves
+  viable_moves = brd.map.with_index { |v, index| index if brd[index] == EMPTY_MARKER}.compact
 end
 
 def computer_move(brd)
@@ -150,7 +145,7 @@ def determine_vector_contents(vector_to_score, brd)
       y_count += 1
     end
   end
-  return x_count, y_count
+  [x_count, y_count]
 end
 
 def calculate_vector_score(vector_contents)
@@ -190,7 +185,7 @@ loop do
       break
     end
 
-    if !board_has_empty_spaces?(board_array)
+    unless board_has_empty_spaces?(board_array)
       puts TIE_MESSAGE
       break
     end
