@@ -1,9 +1,12 @@
 
+require 'pry'
+
 CARD_VALUES = [
   ["2", 2], ["3", 3], ["4", 4], ["5", 5], ["6", 6], ["7", 7],
   ["8", 8], ["9", 9], ["10", 10], ["J", 10], ["Q", 10],
   ["K", 10], ["A", 11]
 ].freeze
+
 CARD_SUITS = ["S", "D", "C", "H"].freeze
 DEALER_FLOOR = 17
 MAX_HAND_VALUE = 21
@@ -37,6 +40,7 @@ def display_hand(hand, mask)
     hand_output.concat(card[0]).concat(card[2])
     hand_output.concat(" ")
   end
+
   if mask == 1
     hand_output[0] = "X"
     hand_output[1] = "X"
@@ -50,13 +54,13 @@ def value_of_hand(hand)
   hand.each do |card|
     hand_total += card[1]
   end
-  return hand_total if count_aces(hand) == 0
 
   revised_hand_total = handle_aces(count_aces(hand), hand_total)
   revised_hand_total
 end
 
 def handle_aces(ace_count, hand_total)
+  return hand_total if ace_count == 0
   hand_total -= (ace_count - 1) * 10 if ace_count > 1
   hand_total -= 10 if hand_total > MAX_HAND_VALUE
   hand_total
@@ -74,8 +78,7 @@ def display_hand_and_total(player_or_dealer, hand, hide_dealer_info)
 end
 
 def bust?(hand)
-  bust = false
-  !bust if value_of_hand(hand) > MAX_HAND_VALUE
+  value_of_hand(hand) > MAX_HAND_VALUE
 end
 
 def dealer_move(dealer_hand)
@@ -90,31 +93,31 @@ end
 
 def who_wins(player_hand, dealer_hand)
   if bust?(player_hand)
-    return "dealer", "Sorry, you busted!"
+    return { winner: "dealer", msg: "Sorry, you busted!" }
   elsif bust?(dealer_hand)
-    return "player", "Congrats! Dealer busted!"
+    return { winner: "player", msg: "Congrats! Dealer busted!" }
   elsif value_of_hand(player_hand) > value_of_hand(dealer_hand)
-    return "player", "Congrats! You had the better hand!"
+    return { winner: "player", msg: "Congrats! You had the better hand!" }
   elsif value_of_hand(player_hand) < value_of_hand(dealer_hand)
-    return "dealer", "Too bad! Dealer had the better hand!"
+    return { winner: "dealer", msg: "Too bad! Dealer had the better hand!" }
   else
-    return "tie", "It's a tie, how exciting!"
+    return { winner: "tie", msg: "It's a tie, how exciting!" }
   end
 end
 
 def manage_end_game(player_hand, dealer_hand, hand_tally)
-  winner = who_wins(player_hand, dealer_hand)
-  puts winner[1]
-  if winner[0] == "player"
-    hand_tally["wins"] += 1
-  elsif winner[0] == "dealer"
-    hand_tally["losses"] += 1
+  result = who_wins(player_hand, dealer_hand)
+  puts result[:msg]
+  if result[:winner] == "player"
+    hand_tally[:wins] += 1
+  elsif result[:winner] == "dealer"
+    hand_tally[:losses] += 1
   else
-    hand_tally["ties"] += 1
+    hand_tally[:ties] += 1
   end
-  puts "Hands Won: #{hand_tally['wins']}\
-    Hands Lost: #{hand_tally['losses']}\
-    Hands Tied: #{hand_tally['ties']}"
+  puts "Hands Won: #{hand_tally[:wins]}\
+    Hands Lost: #{hand_tally[:losses]}\
+    Hands Tied: #{hand_tally[:ties]}"
 end
 
 def display_table_info(player_hand, dealer_hand, dealer_mask)
@@ -123,7 +126,7 @@ def display_table_info(player_hand, dealer_hand, dealer_mask)
   display_hand_and_total("Dealer", dealer_hand, dealer_mask)
 end
 
-hand_tally = { "wins" => 0, "losses" => 0, "ties" => 0 }
+hand_tally = { wins: 0, losses: 0, ties: 0 }
 
 loop do
   deck = initialize_deck
@@ -138,10 +141,11 @@ loop do
     loop do
       puts "Do you want to hit or stay (h or s):"
       hit_or_stand = gets.chomp.downcase
-      break if hit_or_stand.start_with?("s", "h")
+      break if ["h", "hit", "s", "stand"].include?(hit_or_stand)
       puts "Please enter either 'h' or 's'!"
     end
-    if hit_or_stand == "h"
+
+    if hit_or_stand.start_with?("h")
       deal_a_card(deck, player_hand)
       display_table_info(player_hand, dealer_hand, 1)
       break if bust?(player_hand)
@@ -165,6 +169,7 @@ loop do
       break
     end
   end
+
   puts ""
   manage_end_game(player_hand, dealer_hand, hand_tally)
 
