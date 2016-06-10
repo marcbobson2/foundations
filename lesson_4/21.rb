@@ -138,7 +138,7 @@ loop do
     loop do
       puts "Do you want to hit or stay (h or s):"
       hit_or_stand = gets.chomp.downcase
-      break if hit_or_stand.start_with?("s", "h'")
+      break if hit_or_stand.start_with?("s", "h")
       puts "Please enter either 'h' or 's'!"
     end
     if hit_or_stand == "h"
